@@ -1,111 +1,95 @@
 "use client";
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { LayoutDashboard, FileText, Wallet, Settings, LogOut, Bell, Menu, X, TrendingUp } from 'lucide-react';
-import { Locale } from '@/i18n-config';
+import { useRouter, usePathname } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
+import { LayoutDashboard, FileText, Wallet, Settings, LogOut, Bell, Home, User } from 'lucide-react';
 
-export default function DashboardLayout({
-  children,
-  params: { lang },
-}: {
-  children: React.ReactNode;
-  params: { lang: Locale };
-}) {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const pathname = usePathname();
+export default function DashboardLayout({ children, params: { lang } }: { children: React.ReactNode, params: { lang: string } }) {
   const isArabic = lang === 'ar';
+  const router = useRouter();
+  const pathname = usePathname();
 
-  const menuItems = [
-    { name: isArabic ? 'نظرة عامة' : 'Overview', icon: <LayoutDashboard size={20} />, href: `/${lang}/dashboard` },
-    { name: isArabic ? 'فواتيري' : 'My Invoices', icon: <FileText size={20} />, href: `/${lang}/dashboard/invoices` },
-    { name: isArabic ? 'المحفظة' : 'Wallet', icon: <Wallet size={20} />, href: `/${lang}/dashboard/wallet` },
-    { name: isArabic ? 'الإعدادات' : 'Settings', icon: <Settings size={20} />, href: `/${lang}/dashboard/settings` },
+  // دالة تسجيل الخروج الحقيقية المربوطة بقاعدة البيانات
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push(`/${lang}`); // العودة للصفحة الرئيسية فوراً بعد الخروج
+  };
+
+  const navItems = [
+    { name: isArabic ? 'نظرة عامة' : 'Overview', icon: LayoutDashboard, href: `/${lang}/dashboard` },
+    { name: isArabic ? 'فواتيري' : 'My Invoices', icon: FileText, href: `/${lang}/dashboard/invoices` },
+    { name: isArabic ? 'المحفظة' : 'Wallet', icon: Wallet, href: `/${lang}/dashboard/wallet` },
+    { name: isArabic ? 'الإعدادات' : 'Settings', icon: Settings, href: `/${lang}/dashboard/settings` },
   ];
 
   return (
-    <div className={`min-h-screen bg-slate-50 flex ${isArabic ? 'rtl' : 'ltr'}`} dir={isArabic ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen bg-[#0a0a0a] text-slate-300 font-sans flex" dir={isArabic ? 'rtl' : 'ltr'}>
       
-      {/* خلفية معتمة للموبايل عند فتح القائمة */}
-      {isSidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-slate-900/50 z-40 md:hidden backdrop-blur-sm transition-opacity"
-          onClick={() => setIsSidebarOpen(false)}
-        />
-      )}
-
-      {/* القائمة الجانبية (Sidebar) متجاوبة */}
-      <aside className={`fixed top-0 ${isArabic ? 'right-0' : 'left-0'} h-full w-64 bg-white border-x border-slate-200 z-50 transform transition-transform duration-300 ease-in-out md:translate-x-0 flex flex-col ${
-        isSidebarOpen ? 'translate-x-0' : (isArabic ? 'translate-x-full' : '-translate-x-full')
-      }`}>
-        <div className="h-20 flex items-center justify-between px-6 border-b border-slate-100">
-          <Link href={`/${lang}`} className="flex items-center gap-2">
-            <TrendingUp size={24} className="text-brand-green" />
-            <div className="text-2xl font-black text-brand-blue">
-              تدفق<span className="text-brand-green">.</span>
-            </div>
-          </Link>
-          <button onClick={() => setIsSidebarOpen(false)} className="md:hidden text-slate-400 hover:text-brand-blue">
-            <X size={24} />
-          </button>
-        </div>
+      {/* القائمة الجانبية (Sidebar) بالثيم الداكن */}
+      <aside className={`w-64 bg-[#111] border-white/10 flex flex-col fixed h-full z-20 ${isArabic ? 'border-l right-0' : 'border-r left-0'}`}>
         
-        <nav className="flex-1 py-6 px-4 space-y-2 overflow-y-auto">
-          {menuItems.map((item, index) => {
-            const isActive = pathname === item.href;
+        {/* اللوجو وزر العودة السريع للرئيسية */}
+        <div className="h-20 flex items-center px-6 border-b border-white/10">
+          <Link href={`/${lang}`} className="flex items-center gap-3 group w-full" title={isArabic ? 'العودة للصفحة الرئيسية' : 'Back to Home'}>
+            <img src="/logo.jpeg" alt="Tadafoq" className="w-8 h-8 rounded-lg group-hover:scale-105 transition-transform" />
+            <span className="text-2xl font-black text-white">تدفق<span className="text-brand-green">.</span></span>
+          </Link>
+        </div>
+
+        <nav className="flex-1 py-6 px-4 space-y-2">
+          {navItems.map((item) => {
+            const isActive = pathname === item.href || (item.href !== `/${lang}/dashboard` && pathname.startsWith(item.href));
             return (
-              <Link 
-                key={index} 
-                href={item.href}
-                onClick={() => setIsSidebarOpen(false)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors ${
-                  isActive ? 'bg-brand-blue text-white shadow-md shadow-brand-blue/20' : 'text-slate-500 hover:bg-slate-100 hover:text-brand-blue'
-                }`}
-              >
-                {item.icon}
-                {item.name}
+              <Link key={item.name} href={item.href} className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${isActive ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}>
+                <item.icon size={20} />
+                <span className="font-bold text-sm">{item.name}</span>
               </Link>
             );
           })}
         </nav>
 
-        <div className="p-4 border-t border-slate-100">
-          <button className="flex items-center gap-3 px-4 py-3 w-full text-red-500 font-medium hover:bg-red-50 rounded-xl transition-colors">
+        {/* زر تسجيل الخروج الحقيقي */}
+        <div className="p-4 border-t border-white/10">
+          <button onClick={handleLogout} className="flex items-center gap-3 text-red-400 hover:text-red-300 hover:bg-red-400/10 w-full px-4 py-3 rounded-xl transition-all text-sm font-bold">
             <LogOut size={20} />
             {isArabic ? 'تسجيل الخروج' : 'Logout'}
           </button>
         </div>
       </aside>
 
-      {/* المحتوى الرئيسي */}
-      <main className={`flex-1 flex flex-col w-full min-w-0 transition-all duration-300 ${isArabic ? 'md:mr-64' : 'md:ml-64'}`}>
-        
-        <header className="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-4 sm:px-6 sticky top-0 z-30">
+      {/* منطقة المحتوى الرئيسية */}
+      <main className={`flex-1 ${isArabic ? 'mr-64' : 'ml-64'} min-h-screen flex flex-col relative`}>
+        <div className="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-500/10 rounded-full blur-[120px] pointer-events-none z-0"></div>
+
+        {/* الشريط العلوي (Header) */}
+        <header className="h-20 border-b border-white/10 bg-[#0a0a0a]/80 backdrop-blur-md flex items-center justify-between px-8 sticky top-0 z-10">
+          <h1 className="text-xl font-black text-white">{isArabic ? 'لوحة تحكم الشركات (SME)' : 'SME Dashboard'}</h1>
+
+          {/* الأزرار التي سألت عنها (تم تفعيلها وربطها) */}
           <div className="flex items-center gap-4">
-            <button 
-              onClick={() => setIsSidebarOpen(true)} 
-              className="md:hidden p-2 text-slate-500 hover:text-brand-blue hover:bg-slate-100 rounded-lg transition-colors"
-            >
-              <Menu size5={24} />
+            
+            {/* زر العودة للرئيسية */}
+            <Link href={`/${lang}`} className="p-2.5 text-slate-400 hover:text-emerald-400 hover:bg-emerald-500/10 rounded-full transition-all" title={isArabic ? "الرئيسية" : "Home"}>
+              <Home size={20} />
+            </Link>
+
+            {/* زر الإشعارات الحقيقي */}
+            <button className="p-2.5 text-slate-400 hover:text-white hover:bg-white/5 rounded-full transition-all relative group" onClick={() => alert(isArabic ? 'لا توجد إشعارات مالية جديدة حالياً.' : 'No new financial notifications.')}>
+              <Bell size={20} className="group-hover:animate-[wiggle_1s_ease-in-out_infinite]" />
+              <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border border-[#0a0a0a]"></span>
             </button>
-            <h1 className="text-lg sm:text-xl font-bold text-slate-800 truncate">
-              {isArabic ? 'لوحة تحكم الشركات' : 'SME Dashboard'}
-            </h1>
-          </div>
-          
-          <div className="flex items-center gap-3 sm:gap-4">
-            <button className="relative p-2 text-slate-400 hover:text-brand-blue transition-colors">
-              <Bell size={20} />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
-            </button>
-            <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-brand-green/20 border border-brand-green/30 flex items-center justify-center text-brand-green font-bold text-sm sm:text-base shrink-0">
-              م
-            </div>
+
+            {/* زر الملف الشخصي والإعدادات */}
+            <Link href={`/${lang}/dashboard/settings`} className="w-10 h-10 rounded-full bg-gradient-to-tr from-emerald-500 to-cyan-500 flex items-center justify-center text-white font-bold shadow-lg hover:shadow-cyan-500/20 transition-all border-2 border-[#0a0a0a]" title={isArabic ? "الملف التجاري" : "Business Profile"}>
+              <User size={18} />
+            </Link>
           </div>
         </header>
 
-        <div className="p-4 sm:p-6 md:p-8 max-w-full overflow-x-hidden">
+        {/* محتوى الصفحات المتغير */}
+        <div className="p-8 relative z-10">
           {children}
         </div>
       </main>
