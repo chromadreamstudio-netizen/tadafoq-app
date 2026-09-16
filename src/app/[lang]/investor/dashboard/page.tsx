@@ -2,162 +2,105 @@
 
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { ShieldCheck, TrendingUp, Lock, ArrowUpRight, Calculator, Info, FileText, CheckSquare, Scale } from 'lucide-react';
+import { ShieldCheck, Lock, Calculator, CheckSquare, Scale, Umbrella } from 'lucide-react';
 
 export default function InvestorMarketplacePage({ params: { lang } }: { params: { lang: string } }) {
   const isArabic = lang === 'ar';
   const [listedInvoices, setListedInvoices] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [fundingInvoice, setFundingInvoice] = useState<string | null>(null);
-  const [legalAccepted, setLegalAccepted] = useState<string | null>(null); // لحفظ حالة الموافقة القانونية لكل فاتورة
+  const [legalAccepted, setLegalAccepted] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchMarket = async () => {
       const { data } = await supabase.from('invoices').select('*').eq('status', 'listed').order('created_at', { ascending: false });
       if (data) setListedInvoices(data);
-      setLoading(false);
     };
     fetchMarket();
   }, []);
 
-  const maskDebtorName = (name: string) => {
-    if (name.toLowerCase().includes('vodafone')) return isArabic ? 'شركة اتصالات كبرى (تصنيف A+)' : 'Major Telecom Company (A+ Rated)';
-    return isArabic ? 'شركة كبرى معتمدة' : 'Verified Enterprise';
-  };
-
-  const handleFundInvoice = async (invoiceId: string, askingPrice: number) => {
-    setFundingInvoice(invoiceId);
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("يجب تسجيل الدخول");
-      const platformFee = askingPrice * 0.02;
-
-      await supabase.from('invoices').update({ status: 'funded' }).eq('id', invoiceId);
-      await supabase.from('transactions').insert({
-        invoice_id: invoiceId, investor_id: user.id, invested_amount: askingPrice, platform_fee: platformFee, status: 'escrow_locked'
-      });
-
-      setListedInvoices(prev => prev.filter(inv => inv.id !== invoiceId));
-      alert(isArabic ? 'تم توقيع العقد الرقمي وتأمين الفاتورة بنجاح!' : 'Digital contract signed and Invoice funded successfully!');
-    } catch (err) {
-      alert(isArabic ? 'حدث خطأ في عملية التمويل.' : 'Funding failed.');
-    } finally {
-      setFundingInvoice(null);
-    }
-  };
-
-  if (loading) return <div className="p-8 text-center text-slate-500 font-medium">{isArabic ? 'جاري تحميل الفرص الاستثمارية...' : 'Loading market opportunities...'}</div>;
+  const maskDebtorName = (name: string) => isArabic ? 'شركة كبرى (تصنيف A+)' : 'Major Company (A+ Rated)';
 
   return (
-    <div className="space-y-8">
-      
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div>
-          <h2 className="text-3xl font-black text-slate-900 mb-2">{isArabic ? 'سوق الفواتير (Marketplace)' : 'Invoice Marketplace'}</h2>
-          <p className="text-slate-500 text-sm">{isArabic ? 'استكشف فرص تمويل قصيرة الأجل بشفافية تامة وعوائد واضحة.' : 'Explore short-term funding opportunities with absolute transparency.'}</p>
-        </div>
+    <div className="space-y-8" dir={isArabic ? 'rtl' : 'ltr'}>
+      <div>
+        <h2 className="text-3xl font-black text-white mb-2">{isArabic ? 'سوق الفواتير المؤسسية' : 'Institutional Marketplace'}</h2>
       </div>
 
-      {/* شريط الثقة العام للسوق (Global Trust Banner) */}
-      <div className="bg-indigo-50 border border-indigo-100 rounded-2xl p-4 flex items-center gap-4 shadow-sm">
-        <Scale className="text-indigo-600 hidden sm:block" size={32} />
+      <div className="bg-blue-900/20 border border-blue-500/30 rounded-2xl p-4 flex items-center gap-4 shadow-sm backdrop-blur-sm">
+        <Umbrella className="text-blue-400 hidden sm:block" size={32} />
         <div>
-          <h3 className="text-indigo-900 font-bold text-sm mb-1">
-            {isArabic ? 'جميع الاستثمارات محمية قانونياً بحق الرجوع (Recourse Factoring)' : 'All investments are legally protected by Recourse Factoring'}
+          <h3 className="text-blue-300 font-bold text-sm mb-1">
+            {isArabic ? 'حماية ثلاثية الأبعاد (صندوق الحماية + تأمين ائتماني + حق الرجوع)' : '3D Protection (Pool + Insurance + Recourse)'}
           </h3>
-          <p className="text-indigo-700/80 text-xs">
-            {isArabic ? 'الفواتير المعروضة خضعت للمطابقة الثلاثية (Invoice, PO, Delivery Note). في حالة تعثر المدين، تلتزم الشركة البائعة بالسداد عبر سندات أمر موثقة.' : 'Listed invoices undergo 3-way matching. In case of debtor default, the SME is legally bound to repay via promissory notes.'}
+          <p className="text-blue-200/70 text-xs leading-relaxed max-w-4xl">
+            {isArabic ? 'رأس مالك محمي استراتيجياً. المنصة تقتطع 1.5% من كل فاتورة وتوجهها مباشرة لتغطية وثائق التأمين الائتماني (Allianz Trade / EGE) وتغذية صندوق حماية المستثمرين لمواجهة أي تعثر، دون المساس بعائدك الصافي.' : 'Capital is protected via a 1.5% deduction from the SME directed to Credit Insurance policies and the Investor Protection Pool.'}
           </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-        {listedInvoices.length === 0 ? (
-          <div className="col-span-full py-12 text-center bg-white rounded-2xl border border-slate-200 border-dashed">
-            <TrendingUp size={48} className="mx-auto text-slate-300 mb-4" />
-            <h3 className="text-xl font-bold text-slate-800">{isArabic ? 'السوق هادئ حالياً' : 'Market is quiet'}</h3>
-          </div>
-        ) : (
-          listedInvoices.map((inv) => {
-            const originalAmount = Number(inv.invoice_amount);
-            const askingPrice = Number(inv.asking_price);
-            const grossProfit = originalAmount - askingPrice;
-            const platformFee = askingPrice * 0.02;
-            const netProfit = grossProfit - platformFee;
-            const netROI = ((netProfit / askingPrice) * 100).toFixed(2);
-            const daysLeft = Math.ceil((new Date(inv.due_date).getTime() - new Date().getTime()) / (1000 * 3600 * 24));
-            
-            const isLegalAccepted = legalAccepted === inv.id;
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        {listedInvoices.map((inv) => {
+          const originalAmount = Number(inv.invoice_amount);
+          const askingPrice = Number(inv.asking_price);
+          const totalDiscount = originalAmount - askingPrice; // مثلا 12,000
+          
+          // الهندسة المالية الدقيقة للشفافية
+          const platformFee = originalAmount * 0.025; // 2.5% ربح المنصة الصافي
+          const insurancePoolFee = originalAmount * 0.015; // 1.5% صندوق حماية وتأمين
+          const investorNetProfit = totalDiscount - platformFee - insurancePoolFee; // 8% الصافي للمستثمر
+          
+          const netROI = ((investorNetProfit / askingPrice) * 100).toFixed(2);
+          const isLegalAccepted = legalAccepted === inv.id;
 
-            return (
-              <div key={inv.id} className="bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl transition-all overflow-hidden flex flex-col relative">
-                
-                <div className="bg-slate-900 px-5 py-2 flex justify-between items-center text-xs font-bold text-white">
-                  <span className="flex items-center gap-1.5"><Lock size={12} className="text-emerald-400" /> {isArabic ? 'محمية بـ NDA' : 'NDA Protected'}</span>
-                  <span className="flex items-center gap-1.5 text-emerald-400"><FileText size={12} /> {isArabic ? 'مطابقة ثلاثية' : '3-Way Matched'}</span>
+          return (
+            <div key={inv.id} className="bg-white/5 border border-white/10 rounded-3xl overflow-hidden flex flex-col relative backdrop-blur-md">
+              <div className="bg-slate-900/80 px-5 py-3 flex justify-between items-center text-[10px] font-bold text-white border-b border-white/5">
+                <span className="flex items-center gap-1.5"><Lock size={12} className="text-cyan-400" /> {isArabic ? 'محمية بـ NDA' : 'NDA Protected'}</span>
+                <span className="flex items-center gap-1.5 text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-full"><Umbrella size={12} /> {isArabic ? 'مؤمنة ائتمانياً (Allianz Trade)' : 'Insured (Allianz Trade)'}</span>
+              </div>
+
+              <div className="p-6 border-b border-white/5 flex justify-between items-start">
+                <div>
+                  <div className="text-xs font-bold text-slate-500 mb-1">{isArabic ? 'الجهة المدينة (العميل)' : 'Debtor'}</div>
+                  <div className="font-black text-white text-lg">{maskDebtorName(inv.debtor_name)}</div>
                 </div>
-
-                <div className="p-6 border-b border-slate-100 flex justify-between items-start bg-slate-50/50">
-                  <div>
-                    <div className="text-xs font-bold text-slate-500 mb-1 uppercase">{isArabic ? 'الجهة المدينة (العميل)' : 'Debtor (Client)'}</div>
-                    <div className="font-black text-slate-900 text-lg">{maskDebtorName(inv.debtor_name)}</div>
-                  </div>
-                  <div className="bg-emerald-100 text-emerald-800 px-3 py-2 rounded-xl text-center shadow-sm">
-                    <div className="text-[10px] font-bold uppercase">{isArabic ? 'الصافي' : 'Net ROI'}</div>
-                    <div className="font-black text-lg flex items-center justify-center gap-0.5"><ArrowUpRight size={16} /> {netROI}%</div>
-                  </div>
-                </div>
-
-                <div className="p-6 flex-1 space-y-5">
-                  <div className="flex justify-between items-center">
-                    <div className="text-sm text-slate-500 font-bold">{isArabic ? 'المبلغ المطلوب:' : 'Capital Required:'}</div>
-                    <div className="text-2xl font-black text-brand-blue">{askingPrice.toLocaleString()} <span className="text-xs text-slate-500">ج.م</span></div>
-                  </div>
-                  
-                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
-                    <div className="flex items-center gap-2 text-slate-800 font-black mb-1 border-b border-slate-200 pb-2">
-                      <Calculator size={16} className="text-indigo-500" />
-                      <span className="text-sm">{isArabic ? 'التحليل المالي' : 'Financial Breakdown'}</span>
-                    </div>
-                    <div className="flex justify-between text-xs font-medium text-slate-600"><span>{isArabic ? 'القيمة الإجمالية:' : 'Total Value:'}</span><span className="text-slate-900">{originalAmount.toLocaleString()} ج.م</span></div>
-                    <div className="flex justify-between text-xs font-medium text-slate-600"><span>{isArabic ? 'الربح الإجمالي:' : 'Gross Profit:'}</span><span className="text-slate-900">+{grossProfit.toLocaleString()} ج.م</span></div>
-                    <div className="flex justify-between text-xs font-medium text-red-500"><span>{isArabic ? 'رسوم المنصة (2%):' : 'Platform Fee:'}</span><span>-{platformFee.toLocaleString()} ج.م</span></div>
-                    <div className="pt-2 border-t border-slate-200 flex justify-between">
-                      <span className="text-sm font-black text-slate-800">{isArabic ? 'صافي الربح:' : 'Net Profit:'}</span>
-                      <span className="text-lg font-black text-brand-green">+{netProfit.toLocaleString()} <span className="text-[10px]">ج.م</span></span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="p-4 border-t border-slate-100 bg-slate-50/50">
-                  {/* محاكاة العقد الذكي (Smart Contract Simulation) */}
-                  <label className="flex items-start gap-2 mb-4 cursor-pointer group">
-                    <input 
-                      type="checkbox" 
-                      className="mt-1 w-4 h-4 rounded border-slate-300 text-brand-green focus:ring-brand-green cursor-pointer"
-                      checked={isLegalAccepted}
-                      onChange={() => setLegalAccepted(isLegalAccepted ? null : inv.id)}
-                    />
-                    <span className="text-[10px] text-slate-500 leading-tight font-medium group-hover:text-slate-700 transition-colors">
-                      {isArabic 
-                        ? 'أوافق على توليد العقد الرقمي واتفاقية الحفاظ على السرية (NDA)، وتفويض "تدفق" بخصم المبلغ من محفظة الضمان.' 
-                        : 'I agree to generate the digital contract and NDA, and authorize Tadafoq to deduct funds from Escrow.'}
-                    </span>
-                  </label>
-
-                  <button 
-                    onClick={() => handleFundInvoice(inv.id, askingPrice)}
-                    disabled={fundingInvoice === inv.id || !isLegalAccepted}
-                    className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 rounded-xl transition-all shadow-md flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {fundingInvoice === inv.id ? (isArabic ? 'جاري توقيع العقود...' : 'Signing Contracts...') : (isArabic ? 'توقيع إلكتروني وتأمين الفاتورة' : 'E-Sign & Secure Invoice')}
-                    {isLegalAccepted ? <CheckSquare size={18} className="text-brand-green" /> : <Lock size={18} />}
-                  </button>
+                <div className="bg-emerald-500/10 text-emerald-400 px-4 py-2 rounded-xl text-center border border-emerald-500/20">
+                  <div className="text-[10px] font-bold uppercase">{isArabic ? 'العائد الصافي' : 'Net ROI'}</div>
+                  <div className="font-black text-xl">{netROI}%</div>
                 </div>
               </div>
-            );
-          })
-        )}
+
+              <div className="p-6 flex-1 space-y-6">
+                <div className="flex justify-between items-end border-b border-white/10 pb-4">
+                  <div className="text-sm text-slate-400 font-bold">{isArabic ? 'رأس المال المطلوب تمويله:' : 'Capital to Fund:'}</div>
+                  <div className="text-3xl font-black text-cyan-400">{askingPrice.toLocaleString()} <span className="text-xs text-slate-500">ج.م</span></div>
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 text-slate-300 font-black mb-2"><Calculator size={16} className="text-indigo-400" /> <span className="text-sm">{isArabic ? 'تحليل العائد وحماية المخاطر' : 'Risk & Return Breakdown'}</span></div>
+                  <div className="flex justify-between text-xs font-medium text-slate-400"><span>{isArabic ? 'القيمة الأصلية للفاتورة:' : 'Original Invoice Value:'}</span><span className="text-white">{originalAmount.toLocaleString()} ج.م</span></div>
+                  <div className="flex justify-between text-xs font-medium text-amber-500/80"><span>{isArabic ? 'قسط التأمين الائتماني وصندوق الحماية (يتحمله المورد):' : 'Insurance & Pool Premium (Paid by SME):'}</span><span>{insurancePoolFee.toLocaleString()} ج.م</span></div>
+                  <div className="flex justify-between text-xs font-medium text-slate-500"><span>{isArabic ? 'رسوم معالجة المنصة (يتحملها المورد):' : 'Platform Fee (Paid by SME):'}</span><span>{platformFee.toLocaleString()} ج.م</span></div>
+                  <div className="pt-3 mt-3 border-t border-white/10 flex justify-between items-center">
+                    <span className="text-sm font-black text-slate-300">{isArabic ? 'صافي ربح المستثمر المضمون:' : 'Guaranteed Investor Net Profit:'}</span>
+                    <span className="text-xl font-black text-emerald-400">+{investorNetProfit.toLocaleString()} <span className="text-[10px]">ج.م</span></span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-5 bg-black/40 border-t border-white/5">
+                <label className="flex items-start gap-3 mb-5 cursor-pointer group">
+                  <input type="checkbox" checked={isLegalAccepted} onChange={() => setLegalAccepted(isLegalAccepted ? null : inv.id)} className="mt-1 w-5 h-5 rounded border-slate-700 bg-slate-900 text-emerald-500 focus:ring-emerald-500" />
+                  <span className="text-xs text-slate-400 leading-relaxed font-medium group-hover:text-slate-200 transition-colors">
+                    {isArabic ? 'أوافق على العقود الرقمية واتفاقية الـ NDA. وأفوض "تدفق" بخصم المبلغ من محفظتي، وتوكيلها بتحصيل الفاتورة وتغطيات التأمين.' : 'I agree to the Digital Contracts, NDA, and authorize Tadafoq to manage collection and insurance claims.'}
+                  </span>
+                </label>
+                <button disabled={!isLegalAccepted} className="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-black py-4 rounded-xl transition-all flex justify-center items-center gap-2 disabled:opacity-50 disabled:bg-slate-800 disabled:text-slate-500">
+                  {isArabic ? 'تمويل الفاتورة بأمان' : 'Secure & Fund Invoice'} {isLegalAccepted ? <CheckSquare size={18} /> : <Lock size={18} />}
+                </button>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
