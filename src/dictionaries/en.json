@@ -1,0 +1,77 @@
+{
+  "nav": {
+    "howItWorks": "How it works",
+    "services": "Services",
+    "faq": "FAQ",
+    "login": "Login",
+    "startNow": "Get Started"
+  },
+  "hero": {
+    "badge": "Fully Compliant with Local Regulations",
+    "title1": "Turn Your Pending Invoices Into",
+    "title2": "Instant Cash Flow",
+    "subtitle": "Eliminate the Net-90 waiting pressure. We connect your invoices with verified investors to fund your business in 48 hours.",
+    "ctaSME": "Liquidate Invoices Now",
+    "ctaInvestor": "Explore Investments"
+  },
+  "stats": {
+    "vol": "+50M EGP",
+    "volLabel": "Target Funding Volume",
+    "time": "48 Hours",
+    "timeLabel": "Average Funding Time",
+    "legal": "100%",
+    "legalLabel": "Legal Protection & Escrow"
+  },
+  "howItWorks": {
+    "title": "How it Works?",
+    "subtitle": "A transparent, secure process engineered to minimize risk and ensure business continuity.",
+    "smeTitle": "For Businesses (SMEs)",
+    "smeSteps": [
+      "Upload your verified pending invoice and contract.",
+      "Set the discount rate you accept for instant cash.",
+      "Sign the assignment of rights digitally and get funded."
+    ],
+    "investorTitle": "For Investors",
+    "investorSteps": [
+      "Browse credit-checked and approved invoices.",
+      "Select an invoice and deposit funds into our secure Escrow.",
+      "Receive principal plus returns once the debtor pays."
+    ]
+  },
+  "testimonials": {
+    "title": "We Understand Market Challenges",
+    "review1": "Delayed payments were crushing our liquidity. This platform provided a brilliant, safe solution that kept our projects running.",
+    "author1": "Eng. Ahmed M. - Construction CEO",
+    "review2": "The architectural and security framework rivals banking systems. The smartest way to invest excess liquidity.",
+    "author2": "Senior Consultant - Telecom Sector"
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Everything you need to know about security and operations.",
+    "items": [
+      {
+        "q": "Is the process legally binding?",
+        "a": "Yes, operations are fully compliant with Assignment of Rights under civil law, securing all parties."
+      },
+      {
+        "q": "How long does funding take?",
+        "a": "Once an invoice is listed, it is typically funded within 48 hours by our network of verified investors."
+      },
+      {
+        "q": "How is investor capital protected?",
+        "a": "We only accept invoices from reputable large entities, managed entirely through automated Escrow accounts."
+      }
+    ]
+  },
+  "footer": {
+    "desc": "The premier tech platform for invoice factoring and solving cash flow crises for businesses.",
+    "quickLinks": "Quick Links",
+    "registerSME": "Register as Business",
+    "registerInvestor": "Register as Investor",
+    "legal": "Legal Affairs",
+    "terms": "Terms & Conditions",
+    "privacy": "Privacy Policy",
+    "hawala": "Assignment of Rights Policy",
+    "rights": "All Rights Reserved © 2026 - Tadafoq Platform"
+  }
+}

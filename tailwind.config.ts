@@ -9,8 +9,11 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        brand: {
+          blue: "#0f172a", // Slate 900 - لون المؤسسات والثقة
+          green: "#10b981", // Emerald 500 - لون السيولة والنمو
+          light: "#f8fafc", // Slate 50 - لون الخلفيات المريح
+        },
       },
     },
   },
