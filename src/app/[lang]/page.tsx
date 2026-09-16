@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { TrendingUp, ShieldCheck, Globe2, Building2, Fingerprint, Lock, ChevronDown, CheckCircle2, FileText, Zap, HelpCircle, MessageSquare, Phone, X, Send, Server, CreditCard, Award } from 'lucide-react';
 
-// مكون الأنيميشن الشبكي للتدفق النقدي (معدل للثيم الداكن)
 const ParticleNetwork = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -106,14 +105,11 @@ export default function LandingPage({ params: { lang } }: { params: { lang: stri
   return (
     <div className="min-h-screen bg-[#0a0a0a] font-sans relative overflow-x-hidden text-slate-300" dir={isArabic ? 'rtl' : 'ltr'}>
       
-      {/* شبكة الأبعاد الثلاثية في الخلفية */}
       <ParticleNetwork />
 
-      {/* خلفيات ضوئية ماسية (Diamond Glow Effects) */}
       <div className="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] bg-brand-green/10 rounded-full blur-[120px] pointer-events-none mix-blend-screen z-0"></div>
       <div className="fixed bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none mix-blend-screen z-0"></div>
 
-      {/* Navbar - Dark Glassmorphism */}
       <nav className="fixed w-full top-0 z-50 bg-[#0a0a0a]/70 backdrop-blur-xl border-b border-white/10 transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           <Link href={`/${lang}`} className="flex items-center gap-2 md:gap-3 group">
@@ -156,7 +152,6 @@ export default function LandingPage({ params: { lang } }: { params: { lang: stri
         </div>
       </nav>
 
-      {/* Hero Section - Futuristic FinTech (مع صورة البانر) */}
       <div className="relative pt-32 pb-20 lg:pt-40 lg:pb-28 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row items-center gap-16 lg:gap-12 z-10">
         
         <div className="flex-1 text-center lg:text-start z-10">
@@ -193,7 +188,6 @@ export default function LandingPage({ params: { lang } }: { params: { lang: stri
           </div>
         </div>
 
-        {/* عودة صورة البانر بالتصميم الزجاجي */}
         <div className="flex-1 w-full max-w-2xl mx-auto lg:mx-0 z-10 relative animate-in zoom-in duration-1000 delay-300">
           <div className="relative rounded-3xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10 bg-white/5 backdrop-blur-sm transform hover:scale-[1.02] transition-transform duration-700 hover:shadow-[0_30px_60px_rgba(16,185,129,0.2)]">
             <img src="/banner.jpeg" alt="Tadafoq B2B Invoice Factoring" className="w-full h-auto object-cover aspect-[4/3] lg:aspect-auto lg:h-[550px] opacity-90" />
@@ -203,7 +197,6 @@ export default function LandingPage({ params: { lang } }: { params: { lang: stri
 
       </div>
 
-      {/* أختام الثقة والشراكات المخفية (Trust Badges Architecture) */}
       <div className="border-y border-white/10 bg-black/50 backdrop-blur-md py-8 z-10 relative">
         <div className="max-w-7xl mx-auto px-4 flex flex-wrap justify-center gap-8 md:gap-16 opacity-60 grayscale hover:grayscale-0 transition-all">
           <div className="flex items-center gap-2 text-sm font-bold text-white"><Server size={20} /> Powered by AWS & Supabase</div>
@@ -212,7 +205,6 @@ export default function LandingPage({ params: { lang } }: { params: { lang: stri
         </div>
       </div>
 
-      {/* قسم كيف نحمي أموالك (Glassmorphism Cards) */}
       <div className="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 border-b border-white/10">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-black text-white mb-4">{isArabic ? 'درع تدفق الماسي (أمان 100%)' : 'Tadafoq Diamond Shield'}</h2>
@@ -238,7 +230,6 @@ export default function LandingPage({ params: { lang } }: { params: { lang: stri
         </div>
       </div>
 
-      {/* عودة قسم كيف تعمل المنصة بالثيم الداكن */}
       <div className="py-24 bg-black/40 relative z-10 border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -254,18 +245,17 @@ export default function LandingPage({ params: { lang } }: { params: { lang: stri
             <div className="text-center group">
               <div className="w-20 h-20 bg-white/5 rounded-2xl shadow-[0_0_15px_rgba(255,255,255,0.05)] border border-white/10 flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform"><ShieldCheck size={32} className="text-purple-400" /></div>
               <h3 className="text-xl font-bold text-white mb-3">{isArabic ? '2. التحقق والتسعير الذكي' : '2. Smart Verification & Pricing'}</h3>
-              <p className="text-slate-400">{isArabic ? 'نظامنا يتحقق من صحة الفاتورة ويحدد معدل الخصم المناسب بناءً على تقييم المخاطر.' : 'System verifies invoice authenticity and sets discount rate based on risk.'}</p>
+              <p className="text-slate-400">{isArabic ? 'نظامنا يتحقق من صحة الفاتورة ويحدد معدل الخصم المناسب بناءً على تقييم المخاطر عبر الذكاء الاصطناعي.' : 'System verifies invoice authenticity and sets discount rate based on AI risk assessment.'}</p>
             </div>
             <div className="text-center group">
               <div className="w-20 h-20 bg-white/5 rounded-2xl shadow-[0_0_15px_rgba(255,255,255,0.05)] border border-white/10 flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform"><Zap size={32} className="text-brand-green" /></div>
-              <h3 className="text-xl font-bold text-white mb-3">{isArabic ? '3. التمويل الفوري' : '3. Instant Funding'}</h3>
-              <p className="text-slate-400">{isArabic ? 'يقوم المستثمرون بتمويل الفاتورة، وتتحول السيولة فوراً لحساب الشركة البنكي.' : 'Investors fund the invoice, and liquidity is transferred instantly to SME.'}</p>
+              <h3 className="text-xl font-bold text-white mb-3">{isArabic ? '3. التمويل والتحصيل المؤسسي' : '3. Institutional Funding'}</h3>
+              <p className="text-slate-400">{isArabic ? 'يمول المستثمر الفاتورة، وتتولى المنصة الإدارة القانونية والتحصيل لضمان عودة رأس المال بأمان.' : 'Investors fund the invoice, and the platform handles legal collection to ensure safe capital return.'}</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* عودة قسم الأسئلة الشائعة بالثيم الداكن */}
       <div className="py-24 bg-[#0a0a0a] relative z-10 border-b border-white/10">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3 justify-center mb-12">
@@ -279,13 +269,12 @@ export default function LandingPage({ params: { lang } }: { params: { lang: stri
             </div>
             <div className="bg-white/5 p-6 rounded-2xl border border-white/10 shadow-sm hover:bg-white/10 transition-colors">
               <h4 className="font-bold text-lg text-white mb-2">{isArabic ? 'ما هو الضمان للمستثمر؟' : 'What is the guarantee for investors?'}</h4>
-              <p className="text-slate-400">{isArabic ? 'نعمل بنظام التخصيم مع حق الرجوع (Recourse). الشركة البائعة للفاتورة تظل هي الضامن النهائي وتوقع سندات قانونية.' : 'We operate on Recourse Factoring. The SME remains the ultimate guarantor with legal promissory notes.'}</p>
+              <p className="text-slate-400">{isArabic ? 'نعمل بنظام التخصيم مع حق الرجوع (Recourse). الشركة البائعة للفاتورة تظل هي الضامن النهائي، وتتولى "تدفق" تحصيل الأموال بقوة القانون وسندات الأمر.' : 'We operate on Recourse Factoring. Tadafoq acts as the legal collector securing funds via promissory notes.'}</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* عودة الفوتر الكامل بالثيم الداكن */}
       <footer className="bg-black text-slate-400 py-12 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="col-span-1 md:col-span-2">
@@ -302,9 +291,9 @@ export default function LandingPage({ params: { lang } }: { params: { lang: stri
           <div>
             <h4 className="text-white font-bold mb-4">{isArabic ? 'روابط هامة' : 'Important Links'}</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="#" className="hover:text-emerald-400 transition-colors">{isArabic ? 'الشروط والأحكام' : 'Terms & Conditions'}</Link></li>
-              <li><Link href="#" className="hover:text-emerald-400 transition-colors">{isArabic ? 'سياسة الخصوصية' : 'Privacy Policy'}</Link></li>
-              <li><Link href="#" className="hover:text-emerald-400 transition-colors">{isArabic ? 'اتصل بنا' : 'Contact Us'}</Link></li>
+              <li><Link href={`/${lang}/about`} className="hover:text-emerald-400 transition-colors">{isArabic ? 'من نحن' : 'About Us'}</Link></li>
+              <li><Link href={`/${lang}/terms`} className="hover:text-emerald-400 transition-colors">{isArabic ? 'الشروط والأحكام' : 'Terms & Conditions'}</Link></li>
+              <li><Link href={`/${lang}/privacy`} className="hover:text-emerald-400 transition-colors">{isArabic ? 'سياسة الخصوصية' : 'Privacy Policy'}</Link></li>
             </ul>
           </div>
           <div>
@@ -318,9 +307,7 @@ export default function LandingPage({ params: { lang } }: { params: { lang: stri
         </div>
       </footer>
 
-      {/* عودة المساعد الذكي وزر الواتساب بالثيم الداكن (Floating Widget) */}
       <div className={`fixed bottom-6 ${isArabic ? 'left-6' : 'right-6'} z-50 flex flex-col items-end gap-4`}>
-        
         {isChatOpen && (
           <div className="w-80 sm:w-96 bg-[#111] rounded-2xl shadow-2xl border border-white/10 overflow-hidden flex flex-col animate-in slide-in-from-bottom-5 duration-300">
             <div className="bg-black p-4 text-white flex justify-between items-center border-b border-white/10">
@@ -356,19 +343,8 @@ export default function LandingPage({ params: { lang } }: { params: { lang: stri
               <span className="relative inline-flex rounded-full h-4 w-4 bg-white border-2 border-emerald-500"></span>
             </span>
           </button>
-
-          <a 
-            href="https://wa.me/201000000000" 
-            target="_blank" 
-            rel="noreferrer"
-            className={`w-12 h-12 bg-[#25D366] text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-all duration-300 ${isChatOpen ? 'opacity-0 translate-y-4 pointer-events-none' : 'opacity-100 translate-y-0'}`}
-            title="تواصل عبر واتساب"
-          >
-            <Phone size={22} />
-          </a>
         </div>
       </div>
-
     </div>
   );
 }
