@@ -3,50 +3,42 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { TrendingUp, ShieldCheck, Globe2, Building2, Fingerprint, Lock, ChevronDown, CheckCircle2, FileText, Zap, HelpCircle, MessageSquare, Phone, X, Send, Server, CreditCard, Award } from 'lucide-react';
+import { supabase } from '@/lib/supabase'; // تم استدعاء قاعدة البيانات للتحقق من المستخدم
+import { TrendingUp, ShieldCheck, Globe2, Building2, Fingerprint, Lock, ChevronDown, CheckCircle2, FileText, Zap, HelpCircle, MessageSquare, Phone, X, Send, Server, CreditCard, Award, LayoutDashboard, LogOut } from 'lucide-react';
 
+// ... (نفس كود ParticleNetwork الذي كان هنا سابقاً، سأتركه لاختصار المساحة، لكنك ستنسخ الملف كاملاً)
 const ParticleNetwork = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-
     let width = canvas.width = canvas.parentElement?.clientWidth || window.innerWidth;
     let height = canvas.height = canvas.parentElement?.clientHeight || window.innerHeight;
     let particles: any[] = [];
-
     const initParticles = () => {
       particles = [];
       const particleCount = window.innerWidth < 768 ? 30 : 50;
       for (let i = 0; i < particleCount; i++) {
         particles.push({
-          x: Math.random() * width,
-          y: Math.random() * height,
-          vx: (Math.random() - 0.5) * 0.4,
-          vy: (Math.random() - 0.5) * 0.4,
+          x: Math.random() * width, y: Math.random() * height,
+          vx: (Math.random() - 0.5) * 0.4, vy: (Math.random() - 0.5) * 0.4,
           radius: Math.random() * 2 + 0.5
         });
       }
     };
-
     const draw = () => {
       ctx.clearRect(0, 0, width, height);
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
-        p.x += p.vx;
-        p.y += p.vy;
-
+        p.x += p.vx; p.y += p.vy;
         if (p.x < 0 || p.x > width) p.vx *= -1;
         if (p.y < 0 || p.y > height) p.vy *= -1;
-
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
         ctx.fillStyle = i % 2 === 0 ? 'rgba(16, 185, 129, 0.4)' : 'rgba(59, 130, 246, 0.4)';
         ctx.fill();
-
         for (let j = i + 1; j < particles.length; j++) {
           const p2 = particles[j];
           const dist = Math.sqrt(Math.pow(p.x - p2.x, 2) + Math.pow(p.y - p2.y, 2));
@@ -62,21 +54,17 @@ const ParticleNetwork = () => {
       }
       requestAnimationFrame(draw);
     };
-
     initParticles();
     draw();
-
     const handleResize = () => {
       if (!canvas.parentElement) return;
       width = canvas.width = canvas.parentElement.clientWidth;
       height = canvas.height = canvas.parentElement.clientHeight;
       initParticles();
     };
-
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-
   return <canvas ref={canvasRef} className="absolute inset-0 z-0 pointer-events-none opacity-50" />;
 };
 
@@ -88,8 +76,23 @@ export default function LandingPage({ params: { lang } }: { params: { lang: stri
   const [isCountryMenuOpen, setIsCountryMenuOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [session, setSession] = useState<any>(null); // حالة جديدة لحفظ تسجيل الدخول
 
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    setMounted(true);
+    // التحقق من حالة تسجيل الدخول عند تحميل الصفحة
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const countries = [
     { code: 'EG', name: isArabic ? 'مصر' : 'Egypt', currency: isArabic ? 'ج.م' : 'EGP', flag: '🇪🇬' },
@@ -99,6 +102,11 @@ export default function LandingPage({ params: { lang } }: { params: { lang: stri
   const activeCountry = countries.find(c => c.code === country) || countries[0];
 
   const toggleLanguage = () => router.push(`/${isArabic ? 'en' : 'ar'}`);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.refresh();
+  };
 
   if (!mounted) return null;
 
@@ -142,12 +150,26 @@ export default function LandingPage({ params: { lang } }: { params: { lang: stri
               )}
             </div>
 
-            <Link href={`/${lang}/login`} className="text-slate-400 hover:text-white font-bold text-sm transition-colors hidden sm:block">
-              {isArabic ? 'تسجيل الدخول' : 'Login'}
-            </Link>
-            <Link href={`/${lang}/signup`} className="bg-white/10 hover:bg-white/20 border border-white/10 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all backdrop-blur-md">
-              {isArabic ? 'حساب جديد' : 'Sign Up'}
-            </Link>
+            {/* منطق الأزرار الذكي (Auth State) */}
+            {session ? (
+              <>
+                <Link href={`/${lang}/dashboard`} className="text-emerald-400 hover:text-emerald-300 font-bold text-sm transition-colors hidden sm:flex items-center gap-2">
+                  <LayoutDashboard size={16} /> {isArabic ? 'لوحة التحكم' : 'Dashboard'}
+                </Link>
+                <button onClick={handleLogout} className="bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 px-5 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2">
+                  <LogOut size={16} /> {isArabic ? 'خروج' : 'Logout'}
+                </button>
+              </>
+            ) : (
+              <>
+                <Link href={`/${lang}/login`} className="text-slate-400 hover:text-white font-bold text-sm transition-colors hidden sm:block">
+                  {isArabic ? 'تسجيل الدخول' : 'Login'}
+                </Link>
+                <Link href={`/${lang}/signup`} className="bg-white/10 hover:bg-white/20 border border-white/10 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all backdrop-blur-md">
+                  {isArabic ? 'حساب جديد' : 'Sign Up'}
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </nav>
@@ -158,7 +180,8 @@ export default function LandingPage({ params: { lang } }: { params: { lang: stri
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 mb-8 animate-in slide-in-from-bottom-4">
             <ShieldCheck size={16} />
             <span className="text-xs font-bold tracking-wider uppercase">
-              {isArabic ? 'مرخص ومراقب من الجهات المالية | حماية بنكية 256-bit' : 'Regulated Financial Platform | 256-bit Bank Grade Security'}
+              {/* تصحيح التناقض القانوني هنا */}
+              {isArabic ? 'عقود موثقة بحوالة الحق | حماية تقنية 256-bit' : 'Legally Bound Assignment of Debt | 256-bit Security'}
             </span>
           </div>
 
@@ -176,12 +199,13 @@ export default function LandingPage({ params: { lang } }: { params: { lang: stri
           </p>
           
           <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4 animate-in fade-in duration-1000 delay-500">
-            <Link href={`/${lang}/dashboard/invoices/new`} className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 px-8 py-4 rounded-xl font-black text-lg transition-all shadow-[0_0_30px_rgba(16,185,129,0.3)] hover:shadow-[0_0_40px_rgba(16,185,129,0.5)] hover:-translate-y-1 flex items-center justify-center gap-3 relative overflow-hidden group">
+            {/* توجيه الأزرار بناءً على حالة تسجيل الدخول */}
+            <Link href={session ? `/${lang}/dashboard/invoices/new` : `/${lang}/signup`} className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 px-8 py-4 rounded-xl font-black text-lg transition-all shadow-[0_0_30px_rgba(16,185,129,0.3)] hover:shadow-[0_0_40px_rgba(16,185,129,0.5)] hover:-translate-y-1 flex items-center justify-center gap-3 relative overflow-hidden group">
               <div className="absolute inset-0 bg-white/20 w-full translate-x-[-100%] skew-x-[-15deg] group-hover:animate-[shimmer_1.5s_infinite]"></div>
               <Building2 size={24} />
               {isArabic ? 'تمويل شركتي (للموردين)' : 'Fund My Company'}
             </Link>
-            <Link href={`/${lang}/investor/wallet`} className="bg-white/5 hover:bg-white/10 border border-white/10 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all backdrop-blur-md hover:-translate-y-1 flex items-center justify-center gap-3">
+            <Link href={session ? `/${lang}/investor/wallet` : `/${lang}/signup`} className="bg-white/5 hover:bg-white/10 border border-white/10 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all backdrop-blur-md hover:-translate-y-1 flex items-center justify-center gap-3">
               <TrendingUp size={24} />
               {isArabic ? 'استثمار السيولة (للمستثمرين)' : 'Invest Capital'}
             </Link>
